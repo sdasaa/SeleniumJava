@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <Properties>
+        <Property name="logDir" value="./logs/log4j2"/>
+        <Property name="standAloneFile" value="${logDir}/TestExecution_Standalone.log"/>
+        <Property name="rollingFile" value="${logDir}/TestExecution_RollingFile.log"/>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    <!-- log4j limitation-In RollingFile there cannot be any timestamp used in filename, Only file archives can have timestamp as shown belo -->
+        <RollingFile name="RollingLogFile" fileName="${rollingFile}" filePattern="${logDir}/TestExecution_%d{yyyy-MM-dd_HH-mm-ss}.log.zip">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <SizeBasedTriggeringPolicy size="5000"/>
+        </RollingFile>
+        <File name="LogFile" fileName="${standAloneFile}" append="false">
+            <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="ALL">
+            <AppenderRef ref="LogFile"/>
+            <!--AppenderRef ref="RollingLogFile"/-->
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

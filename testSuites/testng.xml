@@ -1,0 +1,27 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="RegressionSuite" verbose="10">
+    <listeners>
+        <listener class-name="com.sj.utils.TestListener"/>
+    </listeners>
+    <parameter name="TestModule" value="HerokuAppTest" />
+    <!--test name="InternetHerokuAppTest1"-->
+    <test name="TestInternetHerokuApp" parallel="classes" thread-count="1">
+        <classes>
+            <!--class name="com.sj.allTests.allWebElements_HerokuApp.TC001_brokenImagesTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC002_challengingDOMTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC003_dragAndDropDemoTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC004_dynamicControlsCBtest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC005_dynamicControlsIPTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC006_dynamicLoadTest1"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC007_dynamicLoadTest2"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC008_fileUploadTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC009_horizontalScrollingTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC010_hoverImagesTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC011_infiniteScrollTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC012_jQueryMenuListTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC013_keyPressEventTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC014_shadowDOMtest"/-->
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC015_formAuthenticationTest"/>
+        </classes>
+    </test>
+</suite>
