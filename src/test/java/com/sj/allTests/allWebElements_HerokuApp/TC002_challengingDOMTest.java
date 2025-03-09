@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class TC002_challengingDOMTest extends internetHerokuAppTestBase {
 
-    @Test
+    @Test(groups = {"Smoke", "Sanity", "Regression"})
     public void TC002_challengingDOMTest() throws IOException, InterruptedException {
         logger.info(" In TC002_challengingDOMTest -> test invoked by Thread -> {} & Driver -> {} ", Thread.currentThread().getId(), DriverManager.getDriver());
         Assert.assertTrue(ihk.selectFromMenu("Challenging DOM"));

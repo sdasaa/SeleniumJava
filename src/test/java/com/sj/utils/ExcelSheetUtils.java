@@ -66,8 +66,59 @@ public class ExcelSheetUtils {
         return loginTestdata2D;
     }
 
-//    public static void main(String[] args) throws IOException {
-//        readExcel();
-//    }
+    public static void writeToExcel(String user, String pwd, String result) throws IOException {
+        try{
+            dataFormatter = new DataFormatter();
+            fi = new FileInputStream(excelFile);
+            wbook = new XSSFWorkbook(fi);
+            sheet = wbook.getSheetAt(0);
+            totalRowCount = sheet.getLastRowNum();
+            totalColCount = sheet.getRow(totalRowCount).getLastCellNum();
+            Iterator<Row> rows = sheet.iterator();
+            while (rows.hasNext()){
+                Row currRow = rows.next();
+                int currRowNum = currRow.getRowNum();
+                System.out.println("currRowNum->"+currRowNum);
+                int count = 0;
+                if(currRowNum > 0){
+                    Iterator<Cell> Cells = currRow.cellIterator();
+                    while (Cells.hasNext()) {
+                        Cell currCell = Cells.next();
+                        int currCellNum = currCell.getColumnIndex();
+                        System.out.println("currCellNum->"+currCellNum);
+                        if(count == 2){
+                            currCell.setCellValue(result);
+                            fo = new FileOutputStream(excelFilePath);
+                            wbook.write(fo);
+                            System.out.println("Count==2"+dataFormatter.formatCellValue(currCell));
+                        }else if(count < 2 && currCellNum > 0) {
+                            String value = dataFormatter.formatCellValue(currCell);
+                            if(value.equalsIgnoreCase(user) || value.equalsIgnoreCase(pwd)) {
+                                count++;
+                                System.out.println("Count-> "+count+" "+dataFormatter.formatCellValue(currCell));
+                            }
+                        }
+                    }
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            wbook.close();
+            fo.close();
+            fi.close();
+        }
+    }
+    public static void main(String[] args) throws IOException {
+/*        readExcel();
+        writeToExcel("admin1", "pass1", "Fail");
+        writeToExcel("admin2", "pass2", "Fail");
+        writeToExcel("admin3", "pass3", "Fail");
+        writeToExcel("tomsmith", "SuperSecretPassword!", "Pass");
+        String s = "sudhakar";
+        String result = s.contains("hak")? "True" : "False";
+        System.out.println(result);*/
+    }
 
 }

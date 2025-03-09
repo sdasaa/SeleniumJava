@@ -43,10 +43,10 @@ public class BaseTest {
     protected static ChromeDriverService chromeDriverService;
     public static TestEventHandlers testEventHandlers;
     public static ExtentReportsUtils extentReportsUtils;
-    protected static File seleniumBrowserLogs;
+    public static File seleniumBrowserLogs;
     public static String formattedDate;
-    protected static String browser;
-    protected static String url;
+    public static String browser;
+    public static String url;
     protected static String screenshotType;
     public static Properties props;
     public static String userDir = System.getProperty("user.dir");

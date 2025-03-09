@@ -12,7 +12,7 @@ import java.util.List;
 
 
 public class TC001_brokenImagesTest extends internetHerokuAppTestBase {
-    @Test
+    @Test(groups = {"Smoke", "Sanity", "Regression"})
     public void TC001_brokenImagesTest() {
         logger.info(" In TC001_brokenImagesTest -> test invoked by Thread -> {} & Driver -> {} ", Thread.currentThread().getId(), DriverManager.getDriver());
         List<Boolean> expectedList = new ArrayList<>();

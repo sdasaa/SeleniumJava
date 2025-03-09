@@ -2,6 +2,8 @@ package com.sj.allTests.allWebElements_HerokuApp;
 
 import com.sj.utils.ExcelSheetUtils;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -14,6 +16,7 @@ public class TC015_formAuthenticationTest extends internetHerokuAppTestBase{
         logger.info(" Inside TC015_formAuthenticationTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
         logger.info(" User -> "+uname+" Pwd-> "+pwd);
         Assert.assertTrue(ihk.selectFromMenu("Form Authentication"));
-        ihk.formAuthenticationTest(uname,pwd);
+        String result = ihk.formAuthenticationTest(uname,pwd);
+        ExcelSheetUtils.writeToExcel(uname, pwd, result);
     }
 }
