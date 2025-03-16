@@ -1,5 +1,6 @@
 package com.sj.utils;
 
+import com.sj.TestBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
@@ -14,14 +15,16 @@ public class DriverManager {
     }
 
     public static void setDriver(WebDriver driver) {
-        DriverManager.threadLocalDriver.set(driver);
+        threadLocalDriver.set(driver);
         logger.info("In DriverManager-setDriver(), Invoked by Thread -> {} & Setting driver -> {}", Thread.currentThread().getId(), DriverManager.threadLocalDriver.get().toString());
     }
 
     public static void quitDriver() {
         logger.info("In DriverManager-quitDriver(), Invoked by Thread -> {} & Removing driver -> {}", Thread.currentThread().getId(), DriverManager.threadLocalDriver.get().toString());
-        //DriverManager.threadLocalDriver.get().quit();
-        DriverManager.threadLocalDriver.get().close();
-        DriverManager.threadLocalDriver.remove();
+        if(TestBase.runOnSeleniumGrid)
+            threadLocalDriver.get().quit();
+        else
+            threadLocalDriver.get().close();
+        threadLocalDriver.remove();
     }
 }

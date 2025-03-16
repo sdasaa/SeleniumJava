@@ -1,6 +1,6 @@
 package com.sj.utils;
 
-import com.sj.BaseTest;
+import com.sj.TestBase;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Driver;
 
-public class TestEventHandlers extends BaseTest {
+public class TestEventHandlers extends TestBase {
 
     private static Logger logger = LogManager.getLogger(TestEventHandlers.class);
     private static int counter = 1;

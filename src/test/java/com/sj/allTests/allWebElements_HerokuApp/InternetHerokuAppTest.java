@@ -1,6 +1,6 @@
 package com.sj.allTests.allWebElements_HerokuApp;
 
-import com.sj.BaseTest;
+import com.sj.TestBase;
 import com.sj.PageObjects.InternetHerokuApp;
 import com.sj.utils.DriverManager;
 import com.sj.utils.ExcelSheetUtils;
@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InternetHerokuAppTest extends BaseTest {
+public class InternetHerokuAppTest extends TestBase {
 
     InternetHerokuApp ihk;
     public InternetHerokuAppTest() {
@@ -31,7 +31,7 @@ public class InternetHerokuAppTest extends BaseTest {
     @BeforeMethod
     public void ihkSetupBeforeMethod() throws IOException {
         logger.info(" Started Execution of ihkSetupBeforeMethod() ");
-        DriverManager.setDriver(new ChromeDriver(getChromeDriverService(), getChromeOptions()));
+        DriverManager.setDriver(new ChromeDriver(chromeDriverService, chromeOptions));
         getThreadLocalDriver().manage().window().maximize();
         getThreadLocalDriver().manage().deleteAllCookies();
         getThreadLocalDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(10));

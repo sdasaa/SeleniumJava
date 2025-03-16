@@ -4,9 +4,9 @@ import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
-import com.sj.BaseTest;
+import com.sj.TestBase;
 
-public class ExtentReportsUtils extends BaseTest {
+public class ExtentReportsUtils extends TestBase {
     ExtentSparkReporter extentSparkReporter;
     ExtentReports extentReports;
     ExtentTest extentTest;

@@ -1,12 +1,8 @@
 package com.sj;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.sj.PageObjects.AllWebElementsRS;
 import com.sj.PageObjects.InternetHerokuApp;
 //import com.sj.allTests.allWebElements_HerokuApp.InternetHerokuAppTest;
-import com.sj.utils.DriverManager;
 import com.sj.utils.ExtentReportsUtils;
 import com.sj.utils.TestEventHandlers;
 import com.sj.utils.TestListener;
@@ -34,7 +30,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.time.LocalDateTime;
 
-public class BaseTest {
+public class TestBase {
 
     protected WebDriver driver;
     protected static FirefoxOptions firefoxOptions;
@@ -51,20 +47,14 @@ public class BaseTest {
     public static Properties props;
     public static String userDir = System.getProperty("user.dir");
 
-    protected BaseTest bt;
     protected AllWebElementsRS rs;
     protected InternetHerokuApp ihk;
     private static final ThreadLocal<WebDriver> threadLocalDriver = new ThreadLocal<WebDriver>();
-    private static final Logger logger = LogManager.getLogger(BaseTest.class);
+    private static final Logger logger = LogManager.getLogger(TestBase.class);
+    public static final boolean runOnSeleniumGrid = Boolean.parseBoolean(System.getProperty("run.on.selenium.grid"));
     
     public WebDriver getDriver() {
         return driver;
-    }
-    public ChromeOptions getChromeOptions() {
-        return chromeOptions;
-    }
-    public ChromeDriverService getChromeDriverService() {
-        return chromeDriverService;
     }
     public static WebDriver getThreadLocalDriver() {
         System.out.println("->"+threadLocalDriver.getClass().toString());
@@ -79,10 +69,10 @@ public class BaseTest {
         setupFormattedDate();
         loadGlobalProperties();
         setupSeleniumBrowserLogs();
-        if(browser.equalsIgnoreCase("chrome"))
-            setupChromeBrowser();
-        else if (browser.equalsIgnoreCase("firefox"))
-            setupFirefoxBrowser();
+        //if(browser.equalsIgnoreCase("chrome"))
+        setupChromeBrowser();
+        //else if (browser.equalsIgnoreCase("firefox"))
+        setupFirefoxBrowser();
         TestListener.setupExtentReports();
     }
 
@@ -90,7 +80,8 @@ public class BaseTest {
     public void tearDownAfterSuite() throws IOException {
         logger.info(" In tearDownAfterSuite(), Invoked by thread -> {}",Thread.currentThread().getId());
         TestListener.extentReports.flush();
-        Runtime.getRuntime().exec("TASKKILL /F /IM chromedriver.exe /T");
+        if(!runOnSeleniumGrid)
+            Runtime.getRuntime().exec("TASKKILL /F /IM chromedriver.exe /T");
         if(Boolean.parseBoolean(props.getProperty("autoOpenExtentReport"))) {
             try {
                 String htmlPath = TestListener.extentReportsHtml;
@@ -165,8 +156,8 @@ public class BaseTest {
 
     void cleanupLogs() throws IOException {
         logger.info(" In cleanupLogs(), Cleaning up Selenium browser logs ");
-        File oldSeleniumLogs = new File(BaseTest.userDir + "\\logs\\SeleniumBrowserLogs");
-        File oldTestExecutionLogs = new File(BaseTest.userDir + "\\logs\\logs4j2");
+        File oldSeleniumLogs = new File(userDir + "\\logs\\SeleniumBrowserLogs");
+        File oldTestExecutionLogs = new File(userDir + "\\logs\\logs4j2");
         if(!FileUtils.isEmptyDirectory(oldSeleniumLogs))
             FileUtils.cleanDirectory(oldSeleniumLogs);
 //        if(!FileUtils.isEmptyDirectory(oldTestExecutionLogs))

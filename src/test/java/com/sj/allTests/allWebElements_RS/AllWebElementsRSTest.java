@@ -1,10 +1,10 @@
 package com.sj.allTests.allWebElements_RS;
 
-import com.sj.BaseTest;
+import com.sj.TestBase;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class AllWebElementsRSTest extends BaseTest {
+public class AllWebElementsRSTest extends TestBase {
 
     @Test(priority = 0)
     public void launchSiteTest(){

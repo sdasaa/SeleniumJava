@@ -10,11 +10,11 @@ import org.apache.logging.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
-import com.sj.BaseTest;
+import com.sj.TestBase;
 
 import java.io.IOException;
 
-// public class TestListener extends BaseTest implements ITestListener {
+// public class TestListener extends TestBase implements ITestListener {
 public class TestListener implements ITestListener {
 
     public static ExtentSparkReporter extentSparkReporter;
@@ -30,7 +30,7 @@ public class TestListener implements ITestListener {
     }
 
     public static void setupExtentReports(){
-        extentReportsHtml = BaseTest.userDir + "//extentReports//"+BaseTest.formattedDate+"//extentReport_"+BaseTest.formattedDate+".html";
+        extentReportsHtml = TestBase.userDir + "//extentReports//"+TestBase.formattedDate+"//extentReport_"+TestBase.formattedDate+".html";
         extentSparkReporter = new ExtentSparkReporter(extentReportsHtml);
         extentReports = new ExtentReports();
         extentReports.attachReporter(extentSparkReporter);
@@ -42,10 +42,10 @@ public class TestListener implements ITestListener {
         /* extentReports Configuration */
         extentReports.setSystemInfo("Tester","Das");
         extentReports.setSystemInfo("OS", "Windows");
-        extentReports.setSystemInfo("Browser", BaseTest.props.getProperty("browser"));
-        extentReports.setSystemInfo("AppUnderTest", BaseTest.props.getProperty("url"));
-        extentReports.setSystemInfo("screenshotType", BaseTest.props.getProperty("screenshotType"));
-        extentReports.setSystemInfo("autoOpenExtentReport", BaseTest.props.getProperty("autoOpenExtentReport"));
+        extentReports.setSystemInfo("Browser", TestBase.props.getProperty("browser"));
+        extentReports.setSystemInfo("AppUnderTest", TestBase.props.getProperty("url"));
+        extentReports.setSystemInfo("screenshotType", TestBase.props.getProperty("screenshotType"));
+        extentReports.setSystemInfo("autoOpenExtentReport", TestBase.props.getProperty("autoOpenExtentReport"));
     }
 
     @Override
