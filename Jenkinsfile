@@ -18,21 +18,21 @@ pipeline{
 
     stages{
 
-        stage1('compile & build Jar'){
+        stage('compile & build Jar'){
             steps{
                 echo " This stage will compile and build the project "
                 bat "mvn clean package -DskipTests"
             }
         }
 
-        stage2('Build Docker image'){
+        stage('Build Docker image'){
             steps{
                 echo " This stage will build a docker image from the Dockerfile "
                 bat "docker build -t sdasa/selenium-docker:latest ."
             }
         }
 
-        stage3('Push image to DockerHub'){
+        stage('Push image to DockerHub'){
             steps{
                 echo " This stage will push the Docker image to DockerHub "
                 bat "docker push sdasa/selenium-docker"
