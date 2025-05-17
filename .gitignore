@@ -5,6 +5,7 @@
 **/logs/**
 **/screenshots/**
 **/test-output/**
+**/DummyTest.java
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
