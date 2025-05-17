@@ -13,7 +13,7 @@
 pipeline{
 
     agent{
-        label 'windowsLaptop'
+        label 'windows'
     }
 
     stages{
