@@ -6,10 +6,8 @@
     <artifactId>SeleniumJava</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>SeleniumJava</name>
     <url>http://maven.apache.org</url>
-
     <properties>
         <java-compiler.version>21</java-compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,12 +27,11 @@
         <!-- plugins versions -->
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
-        <maven.dependency.plugin.version></maven.dependency.plugin.version>
-        <maven.jar.plugin.version></maven.jar.plugin.version>
-        <maven.resource.plugin.version></maven.resource.plugin.version>
+        <maven.dependency.plugin.version>3.7.1</maven.dependency.plugin.version>
+        <maven.jar.plugin.version>3.4.1</maven.jar.plugin.version>
+        <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
 
-
-        <!-- System Variables by default -->
+        <!-- Setting System Variables from mvn-surefire-plugin -->
         <!--browser.prop>chrome</browser.prop>
         <grid.enabled.prop>false</grid.enabled.prop>
         <grid.url.format.prop>http://%s:4444</grid.url.format.prop>
@@ -102,22 +99,29 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
     <build>
+        <!-- This finalName tag will be the name of the jars that are created by compiling src/{main,test}/java ->
+                selenium-docker.jar
+                selenium-docker-test.jar
+        -->
+        <finalName>selenium-docker</finalName>
+        <!-- Compiler plugin is used to compile the java project -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <release>${java-compiler.version}</release>
                 </configuration>
             </plugin>
+            <!-- Surefire is used to trigger tests using mvn test cmd -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
+                <version>${maven.surefire.plugin.version}</version>
                 <configuration>
+                    <!-- We can set systemVariables from pom.xml as well, as shown below -->
                     <!--systemPropertyVariables>
                         <browser>${browser.prop}</browser>
                         <grid.enabled>${grid.enabled.prop}</grid.enabled>
@@ -133,12 +137,66 @@
                     <reportsDirectory>${project.build.directory}/test-output/surefire-reports</reportsDirectory>
                 </configuration>
             </plugin>
+            <!-- dependency plugin is used to copy all the .m2/dependencies.jar to a specific location -->
             <plugin>
-                <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven.dependency.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>
+                                copy-dependencies
+                            </goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${docker.package.directory}/libs
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        <!-- Jar plugin is used to customize the compiled jar, by default mvn compiled only src/main/*
+            We have configured mvn to take up src/test/* -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
+                <configuration>
+                    <outputDirectory>
+                        ${docker.package.directory}/libs
+                    </outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>package-tests-jar</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>
+                                test-jar
+                            </goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                **/*.class
+                            </includes>
+                            <outputDirectory>
+                                ${docker.package.directory}/libs
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+<!-- Resources plugin is used to copy src/{main,test}/resources/{log4j,testData,testSuite,configurations} dirs to a specific location -->
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.resources.plugin}</version>
+                <version>${maven.resource.plugin.version}</version>
                 <executions>
+<!-- Exec1: To copy .xlsx file from target dir to target/test-output dir which will be created by TestNG post successfull run -->
                     <execution>
                         <id>copy-resources</id>
                         <phase>verify</phase>
@@ -156,6 +214,17 @@
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+<!-- Exec2: To copy src/test/resources/* to target/docker-resources -->
+                    <execution>
+                        <id>copy-test-resources</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>testResources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${docker.package.directory}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
