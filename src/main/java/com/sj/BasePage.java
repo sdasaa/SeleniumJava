@@ -2,15 +2,12 @@ package com.sj;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.interactions.Actions;
-
 
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -22,7 +19,7 @@ public abstract class BasePage {
     protected FluentWait<Type> fluWait;
     protected JavascriptExecutor jsExecutor;
     protected Actions actions;
-    protected Logger logger = LogManager.getLogger(this.getClass());
+    private static final Logger logger = LogManager.getLogger(BasePage.class);
 
     public BasePage(WebDriver driver){
         this.driver = driver;

@@ -1,6 +1,7 @@
 package com.sj.allTests.allWebElements_RS;
 
 import com.sj.TestBase;
+import com.sj.utils.DriverManager;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -9,7 +10,7 @@ public class AllWebElementsRSTest extends TestBase {
     @Test(priority = 0)
     public void launchSiteTest(){
         rs.isAt();
-        String title = getDriver().getTitle();
+        String title = DriverManager.getDriver().getTitle();
         Assert.assertEquals(title, "Practice Page");
     }
 

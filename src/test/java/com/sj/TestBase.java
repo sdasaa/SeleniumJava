@@ -2,77 +2,62 @@ package com.sj;
 
 import com.sj.PageObjects.AllWebElementsRS;
 import com.sj.PageObjects.InternetHerokuApp;
-//import com.sj.allTests.allWebElements_HerokuApp.InternetHerokuAppTest;
-import com.sj.utils.ExtentReportsUtils;
-import com.sj.utils.TestEventHandlers;
+import com.sj.utils.ConfigurationUtilities;
+import com.sj.utils.Constants;
 import com.sj.utils.TestListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.chromium.ChromiumDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxDriverService;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.GeckoDriverService;
-import org.testng.annotations.*;
-import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.NoSuchDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class TestBase {
 
     protected WebDriver driver;
+    protected RemoteWebDriver remoteWebDriver;
+    protected InternetHerokuApp ihk;
+    protected AllWebElementsRS rs;
     protected static FirefoxOptions firefoxOptions;
     protected static FirefoxDriverService firefoxService;
     protected static ChromeOptions chromeOptions;
     protected static ChromeDriverService chromeDriverService;
-    public static TestEventHandlers testEventHandlers;
-    public static ExtentReportsUtils extentReportsUtils;
-    protected static File seleniumBrowserLogs;
+    protected static File seleniumBrowserLogFile;
     public static String formattedDate;
-    protected static String browser;
-    protected static String url;
-    protected static String screenshotType;
-    public static Properties props;
-    public static String userDir = System.getProperty("user.dir");
-
-    protected AllWebElementsRS rs;
-    protected InternetHerokuApp ihk;
-    private static final ThreadLocal<WebDriver> threadLocalDriver = new ThreadLocal<WebDriver>();
+    public static String formattedTime;
+    public static String formattedDateAndTime;
     private static final Logger logger = LogManager.getLogger(TestBase.class);
-    public static final boolean runOnSeleniumGrid = Boolean.parseBoolean(System.getProperty("run.on.selenium.grid"));
-    
-    public WebDriver getDriver() {
-        return driver;
-    }
-    public static WebDriver getThreadLocalDriver() {
-        System.out.println("->"+threadLocalDriver.getClass().toString());
-        return threadLocalDriver.get();
-    }
 
     @BeforeSuite(alwaysRun = true)
-    // @Parameters({"TestModule"})
     public void initializeBeforeSuite() throws IOException {
-        logger.info(" In initializeBeforeSuite(), Invoked by Thread -> {}",Thread.currentThread().getId());
-        cleanupLogs();
-        setupFormattedDate();
-        loadGlobalProperties();
-        setupSeleniumBrowserLogs();
-        //if(browser.equalsIgnoreCase("chrome"))
-        setupChromeBrowser();
-        //else if (browser.equalsIgnoreCase("firefox"))
-        setupFirefoxBrowser();
+        logger.info(" In initializeBeforeSuite(), Invoked by Thread -> {}", Thread.currentThread().getId());
+        this.setupFormattedDate();
+        ConfigurationUtilities.loadDefaultProperties(Constants.DEFAULT_PROPERTIES_FILE);
+        if(Boolean.parseBoolean(ConfigurationUtilities.getProperty(Constants.CLEANUP_LOCAL)))
+            this.cleanUpLocal();
+        switch (ConfigurationUtilities.getProperty(Constants.BROWSER)) {
+            case Constants.CHROME -> setupChromeBrowser();
+            case Constants.FIREFOX -> setupFirefoxBrowser();
+            default -> throw new NoSuchDriverException(" The browser defined is not supported, try again with CHROME or FIREFOX ");
+        }
         TestListener.setupExtentReports();
     }
 
@@ -80,131 +65,107 @@ public class TestBase {
     public void tearDownAfterSuite() throws IOException {
         logger.info(" In tearDownAfterSuite(), Invoked by thread -> {}",Thread.currentThread().getId());
         TestListener.extentReports.flush();
-        if(!runOnSeleniumGrid)
-            Runtime.getRuntime().exec("TASKKILL /F /IM chromedriver.exe /T");
-        if(Boolean.parseBoolean(props.getProperty("autoOpenExtentReport"))) {
-            try {
-                String htmlPath = TestListener.extentReportsHtml;
-                htmlPath = htmlPath.replaceAll("\\//", "\\/");
-                htmlPath = htmlPath.replaceAll("\\\\", "\\/");
-                URI urlToOpenAutomatically = new URI(htmlPath);
-                Desktop.getDesktop().browse(urlToOpenAutomatically);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+        if(!Boolean.parseBoolean(ConfigurationUtilities.getProperty(Constants.GRID_ENADLED))) {
+            logger.info(" Killing unwanted chrome instances ");
+            Runtime.getRuntime().exec(Constants.LOCAL_CHROME_KILL);
+            if (Boolean.parseBoolean(ConfigurationUtilities.getProperty(Constants.AUTO_OPEN_EXECUTION_REPORT))) {
+                try {
+                    logger.info(" Excecution completed, Opening the results.html in local browser ");
+                    String htmlPath = TestListener.extentReportsHtml;
+                    htmlPath = htmlPath.replaceAll("\\//", "\\/");
+                    htmlPath = htmlPath.replaceAll("\\\\", "\\/");
+                    URI urlToOpenAutomatically = new URI(htmlPath);
+                    Desktop.getDesktop().browse(urlToOpenAutomatically);
+                } catch (Exception e) {
+                    logger.error(" Unable to open TestExecution report !! ");
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    public Properties loadGlobalProperties() throws IOException {
-        props = new Properties();
-        FileReader reader = new FileReader(userDir + "//globalProperties.properties");
-        props.load(reader);
-        url = props.getProperty("testUrl");
-        browser = props.getProperty("browser");
-        screenshotType = props.getProperty("screenshotType");
-        logger.info(" In loadGlobalProperties(), The following values have been set globally url->{} browser->{} screenshotType->{}", url, browser, screenshotType);
-        return props;
-    }
-
     void setupChromeBrowser(){
-        logger.info(" In setupChromeBrowser(), Invoked by thread -> {}",Thread.currentThread().getId());
+        logger.info(" In setupChromeBrowser(), Invoked by thread -> {}",Thread.currentThread().threadId());
         chromeDriverService = new ChromeDriverService.Builder()
                             .withLogLevel(ChromiumDriverLogLevel.INFO)
                             .withAppendLog(false)
                             .withReadableTimestamp(true)
-                            .withLogFile(seleniumBrowserLogs)
+                            .withLogFile(seleniumBrowserLogFile)
                             .withVerbose(true)
                             .build();
         chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--start-maximized");
+        chromeOptions.setAcceptInsecureCerts(true);
+        chromeOptions.setPageLoadTimeout(Duration.ofSeconds(10));
     }
 
     void setupFirefoxBrowser(){
-        logger.info(" In setupFirefoxBrowser(), Invoked by thread -> {}",Thread.currentThread().getId());
+        logger.info(" In setupFirefoxBrowser(), Invoked by thread -> {}",Thread.currentThread().threadId());
         firefoxService = new GeckoDriverService.Builder()
                 .withLogLevel(FirefoxDriverLogLevel.INFO)
-                .withLogFile(seleniumBrowserLogs)
+                .withLogFile(seleniumBrowserLogFile)
                 .build();
         firefoxOptions = new FirefoxOptions();
         firefoxOptions.addArguments("--start-maximized");
+        firefoxOptions.setAcceptInsecureCerts(true);
+        firefoxOptions.setPageLoadTimeout(Duration.ofSeconds(10));
     }
 
     void setupFormattedDate(){
-        logger.info(" In setupFormattedDate(), Invoked by thread -> {}",Thread.currentThread().getId());
-        //Method-1
-        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy_HHmmss");
+        logger.info(" In setupFormattedDate(), Invoked by thread -> {}",Thread.currentThread().threadId());
+        // Method-1
         Date date = new Date();
-        formattedDate = formatter.format(date).toString();
-        logger.info(" Method 1 -> formattedDate -> {}",formattedDate);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-mm-yyyy");
+        formattedDate = simpleDateFormat.format(date);
+        formattedTime = new SimpleDateFormat("hh-mm-ss").format(date);
+        formattedDateAndTime = new SimpleDateFormat("dd-MM-yyyy_hh-mm-ss").format(date);
+        logger.info(" Method 1 -> formattedDate -> {} formattedTime -> {} formattedDateAndTime -> {}",formattedDate, formattedTime, formattedDateAndTime);
         // Method-2
         LocalDateTime currentDateTime = LocalDateTime.now();
         logger.info(" Method 2 -> currentDateTime -> {}",currentDateTime);
     }
+
+    void cleanUpLocal(){
+        logger.info(" CLEANUP_LOCAL is TRUE, Cleanup initiated ");
+        this.setupSeleniumBrowserLogs();
+        this.systemCleanup();
+    }
+
     void setupSeleniumBrowserLogs(){
-        logger.info(" In setupSeleniumBrowserLogs(), Invoked by thread -> {}",Thread.currentThread().getId());
-        File currentSeleniumLogs = new File(userDir + "//logs//SeleniumBrowserlogs//"+formattedDate);
-        if(!currentSeleniumLogs.exists())
-            currentSeleniumLogs.mkdirs();
-        seleniumBrowserLogs = new File(currentSeleniumLogs +"//seleniumLogs.txt");
-    }
-
-    TestEventHandlers setupTestEventHandlers() {
-        logger.info(" In setupTestEventHandlers(), Invoked by thread -> {}",Thread.currentThread().getId());
-        testEventHandlers = new TestEventHandlers();
-        return testEventHandlers;
-    }
-
-    void cleanupLogs() throws IOException {
-        logger.info(" In cleanupLogs(), Cleaning up Selenium browser logs ");
-        File oldSeleniumLogs = new File(userDir + "\\logs\\SeleniumBrowserLogs");
-        File oldTestExecutionLogs = new File(userDir + "\\logs\\logs4j2");
-        if(!FileUtils.isEmptyDirectory(oldSeleniumLogs))
-            FileUtils.cleanDirectory(oldSeleniumLogs);
-//        if(!FileUtils.isEmptyDirectory(oldTestExecutionLogs))
-//            FileUtils.cleanDirectory(oldTestExecutionLogs);
-    }
-
-    ExtentReportsUtils setupExtentReportsUtils(){
-        logger.info(" In setupExtentReports(), Invoked by thread -> {}",Thread.currentThread().getId());
-        extentReportsUtils = new ExtentReportsUtils();
-        extentReportsUtils.setupExtentReports();
-        return extentReportsUtils;
-    }
-
-    /*
-        formattedDate = formattedDate.replaceAll("[^a-zA-Z0-9]", "_");
-        formattedDate = formattedDate.replaceAll("/", "");
-        formattedDate = formattedDate.replaceAll(":", "");
-        System.out.println("AF formattedDate ->" + formattedDate);
-         File file = new File(System.getProperty("user.dir") + "//logs//SeleniumBrowserlogs//Log_" + dummy + ".log");
-         File file = new File(System.getProperty("user.dir") + "//logs//SeleniumBrowserlogs//Log_" + LocalDateTime.now() + ".log");
-        seleniumBrowserLogs = new File(System.getProperty("user.dir") + "//logs//SeleniumBrowserlogs//log_1.txt");
-
-        @AfterMethod
-        public void AfterMethod(String testModule){
-            System.out.println("**************************** Inside @AfterMethod ****************************");
-            driver.quit();
-            driver = new ChromeDriver(service , options);
-            driver.manage().window().maximize();
-            driver.manage().deleteAllCookies();
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-            driver.get(url);
+        logger.info(" In setupSeleniumBrowserLogs(), Invoked by thread -> {}",Thread.currentThread().threadId());
+        File todaysSeleniumLogDir = new File(Constants.SELENIUM_BROWSER_LOGS_DIR);
+        if(!todaysSeleniumLogDir.exists()) {
+            todaysSeleniumLogDir.mkdirs();
         }
-        @AfterMethod
-        public void tearDown(){
-            System.out.println("**************************** Inside @AfterTest ****************************");
-            driver.quit();
+        seleniumBrowserLogFile = new File(Constants.SELENIUM_BROWSER_LOGS_FILE);
+    }
+
+    void systemCleanup() {
+        logger.info(" In systemCleanup(), Cleaning up obsolete Reports, Screenshots, Selenium & Execution logs ");
+        File seleniumLogsDir    = new File(Constants.SELENIUM_BROWSER_LOGS_DIR);
+        File executionLogsDir   = new File(Constants.LOG4J2_DIR);
+        File extentReportsDir   = new File(Constants.EXTENT_REPORTS_DIR);
+        File screenshotDir      = new File(Constants.SCREENSHOTS_DIR);
+        logger.info(" Cleaning will be attempted on the following dirs -> \n" +
+                            " SELENIUM_BROWSER_LOGS_DIR -> {} \n" +
+                            " LOG4J2_DIR -> {} \n" +
+                            " EXTENT_REPORTS_DIR -> {} \n" +
+                            " SCREENSHOTS_DIR -> {} \n" ,
+        seleniumLogsDir.getPath(), executionLogsDir.getPath(), extentReportsDir.getPath(), screenshotDir.getPath());
+        try {
+            if (Integer.parseInt(FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(seleniumLogsDir)).split(" ")[0]) > 8)
+                FileUtils.cleanDirectory(seleniumLogsDir);
+            if (Integer.parseInt(FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(extentReportsDir)).split(" ")[0]) > 8)
+                FileUtils.cleanDirectory(extentReportsDir);
+            if (Integer.parseInt(FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(executionLogsDir)).split(" ")[0]) > 8)
+                FileUtils.cleanDirectory(executionLogsDir);
+            if (Integer.parseInt(FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(screenshotDir)).split(" ")[0]) > 8)
+                FileUtils.cleanDirectory(screenshotDir);
+            FileUtils.forceMkdir(new File(Constants.SELENIUM_BROWSER_LOGS_CURR_DIR));
+            FileUtils.forceMkdir(new File(Constants.EXTENT_REPORTS_CURR_DIR));
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
-        protected TestEventHandlers getScreenShotAsFile(String testName) throws IOException {
-        logger.warn(" The test -> {} has failed !! Initiating Screenshot ", testName);
-        if(this.testEventHandlers == null) {
-            System.out.println(" testEventHandlers ref is null, creating a new obj !! ");
-            testEventHandlers = new TestEventHandlers();
-        }
-        testEventHandlers = new TestEventHandlers();
-        testEventHandlers.takeScreenshot(testName);
-        return testEventHandlers;
-    }
-    */
+
 }

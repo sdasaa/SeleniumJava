@@ -5,47 +5,42 @@ import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
+import com.sj.TestBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
-import com.sj.TestBase;
 
-import java.io.IOException;
-
-// public class TestListener extends TestBase implements ITestListener {
 public class TestListener implements ITestListener {
 
     public static ExtentSparkReporter extentSparkReporter;
     public static ExtentReports extentReports;
     public static ExtentTest extentTest;
     public static String extentReportsHtml;
-    Logger logger = LogManager.getLogger(this.getClass());
-    TestEventHandlers testEventHandlers;
-
-    //Constructor
-    public TestListener(){
-        logger.info(" In TestListener constructor ");
-    }
+    public static final Logger logger = LogManager.getLogger(TestListener.class);
 
     public static void setupExtentReports(){
-        extentReportsHtml = TestBase.userDir + "//extentReports//"+TestBase.formattedDate+"//extentReport_"+TestBase.formattedDate+".html";
+        logger.info(" In setupExtentReports(), initializing defaults, EXTENT_REPORT_FILE -> {} ", Constants.EXTENT_REPORT_FILE);
+        extentReportsHtml = Constants.EXTENT_REPORT_FILE;
         extentSparkReporter = new ExtentSparkReporter(extentReportsHtml);
         extentReports = new ExtentReports();
         extentReports.attachReporter(extentSparkReporter);
+        logger.info(" extentReportsHtml -> {} ", extentReportsHtml);
+
         /* extentSparkReporter Configuration */
-        extentSparkReporter.config().setDocumentTitle("TestAutomationReport");
-        extentSparkReporter.config().setReportName("TestExecutionReport");
+        extentSparkReporter.config().setDocumentTitle(Constants.DOCUMENT_TITLE);
+        extentSparkReporter.config().setReportName(Constants.REPORT_NAME);
         extentSparkReporter.config().setTheme(Theme.STANDARD);
-        extentSparkReporter.config().setTimeStampFormat("EEEE, MMMM dd, yyyy, hh:mm a '('zzz')'");
+        extentSparkReporter.config().setTimeStampFormat(Constants.TIME_STAMP_FORMAT);
+
         /* extentReports Configuration */
-        extentReports.setSystemInfo("Tester","Das");
-        extentReports.setSystemInfo("OS", "Windows");
-        extentReports.setSystemInfo("Browser", TestBase.props.getProperty("browser"));
-        extentReports.setSystemInfo("AppUnderTest", TestBase.props.getProperty("url"));
-        extentReports.setSystemInfo("screenshotType", TestBase.props.getProperty("screenshotType"));
-        extentReports.setSystemInfo("autoOpenExtentReport", TestBase.props.getProperty("autoOpenExtentReport"));
+        extentReports.setSystemInfo(Constants.TESTER,Constants.DAS);
+        extentReports.setSystemInfo(Constants.OS, Constants.WINDOWS);
+        extentReports.setSystemInfo(Constants.APP_UNDER_TEST, Constants.INTERNET_HEROKU_APP);
+        extentReports.setSystemInfo(Constants.BROWSER, ConfigurationUtilities.getProperty(Constants.BROWSER));
+        extentReports.setSystemInfo(Constants.SCREENSHOT_TYPE, ConfigurationUtilities.getProperty(Constants.SCREENSHOT_TYPE));
+        extentReports.setSystemInfo(Constants.AUTO_OPEN_EXECUTION_REPORT, ConfigurationUtilities.getProperty(Constants.AUTO_OPEN_EXECUTION_REPORT));
     }
 
     @Override
@@ -53,60 +48,43 @@ public class TestListener implements ITestListener {
         logger.info(" In onStart(), Invoked by Thread -> {} " +
                                             "getAllTestMethods -> {} \n" +
                                             "getCurrentXmlTest -> {} \n",
-                                            Thread.currentThread().getId(), context.getAllTestMethods(), context.getCurrentXmlTest()
+                                            Thread.currentThread().threadId(), context.getAllTestMethods(), context.getCurrentXmlTest()
                     );
     }
 
     @Override
     public void onFinish(ITestContext context) {
-        logger.info(" In onFinish(), Invoked by Thread -> {} ", Thread.currentThread().getId());
+        logger.info(" In onFinish(), Invoked by Thread -> {} ", Thread.currentThread().threadId());
     }
 
     @Override
     public void onTestStart(ITestResult result) {
-        //logger.info("Started Execution of Test -> {} and the status of the test is -> {}", result.getName() , result.getStatus());
-        logger.info(" In onTestStart(), Invoked by Thread -> {} getName -> {} getTestClass -> {}", Thread.currentThread().getId(), result.getName(), result.getTestClass());
+        logger.info(" In onTestStart(), Invoked by Thread -> {} getName -> {} getTestClass -> {}", Thread.currentThread().threadId(), result.getName(), result.getTestClass());
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        //logger.info("The Test -> {} is PASSED -> {} ", result.getName() , result.getStatus());
-        logger.info(" In onTestSuccess(), Invoked by Thread -> {} ", Thread.currentThread().getId());
+        logger.info(" In onTestSuccess(), Invoked by Thread -> {} ", Thread.currentThread().threadId());
+        logger.info("The Test -> {} is PASSED -> {} ", result.getName() , result.getStatus());
         extentTest = extentReports.createTest(result.getName());
-        //extentReports.createTest(result.getTestClass().getName());
         extentTest.log(Status.PASS , "The test " + result.getName() + " is PASSED ");
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        logger.info(" In onTestFailure(), Invoked by Thread -> {} ", Thread.currentThread().getId());
-        //logger.error(" This Test -> {} has FAILED! -> {} ",result.getName(), result.getStatus() );
+        logger.info(" In onTestFailure(), Invoked by Thread -> {} ", Thread.currentThread().threadId());
+        logger.error(" This Test -> {} has FAILED! -> {} ",result.getName(), result.getStatus() );
         extentTest = extentReports.createTest(result.getName());
-        //extentReports.createTest(result.getTestClass().getName());
         extentTest.log(Status.FAIL , "The test " + result.getName() + " is FAILED! ");
-        try {
-//            extentReportsUtils.extentTest.log(Status.FAIL, result.getName());
-//            getScreenShotAsFile(result.getName());
-//            testEventHandlers.takeScreenshotAsFile2(result);
-            logger.info(" In onTestFailure(), calling addScreenCaptureFromPath() passing test name -> ", result.getName());
-            extentTest.addScreenCaptureFromPath(TestEventHandlers.takeScreenshot(result.getName()));
-        } catch (Exception e) {
-            try {
-                logger.error(" Taking screenshot for the Test -> {} has FAILED! -> {} ; Initiating tearDownByForce() ",result.getName(), result.getStatus() );
-                testEventHandlers.tearDownByForce();
-            } catch (Exception ex) {
-                logger.error(" tearDownByForce() has Failed! ");
-                throw new RuntimeException(ex);
-            }
-            throw new RuntimeException(e);
-        }
-        ITestListener.super.onTestFailure(result);
+        logger.info(" In onTestFailure(), calling addScreenCaptureFromPath() passing test name -> ", result.getName());
+        extentTest.addScreenCaptureFromPath(TestEventHandlers.takeScreenshot(result));
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
         logger.warn(" This Test -> {} has been SKIPPED -> {} ",result.getName(), result.getStatus() );
-        //extentReportsUtils.extentTest.log(Status.SKIP, result.getName());
+        extentTest = extentReports.createTest(result.getName());
+        extentTest.log(Status.SKIP, result.getName());
     }
 
     @Override

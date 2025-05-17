@@ -1,18 +1,18 @@
 package com.sj.allTests.allWebElements_HerokuApp;
 
-import com.sj.TestBase;
 import com.sj.PageObjects.InternetHerokuApp;
+import com.sj.TestBase;
+import com.sj.utils.ConfigurationUtilities;
+import com.sj.utils.Constants;
 import com.sj.utils.DriverManager;
 import com.sj.utils.ExcelSheetUtils;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -32,26 +32,26 @@ public class InternetHerokuAppTest extends TestBase {
     public void ihkSetupBeforeMethod() throws IOException {
         logger.info(" Started Execution of ihkSetupBeforeMethod() ");
         DriverManager.setDriver(new ChromeDriver(chromeDriverService, chromeOptions));
-        getThreadLocalDriver().manage().window().maximize();
-        getThreadLocalDriver().manage().deleteAllCookies();
-        getThreadLocalDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        getThreadLocalDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-        getThreadLocalDriver().get(url);
+        DriverManager.getDriver().manage().window().maximize();
+        DriverManager.getDriver().manage().deleteAllCookies();
+        DriverManager.getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        DriverManager.getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+        DriverManager.getDriver().get(ConfigurationUtilities.getProperty(Constants.TEST_URL));
         ihk = new InternetHerokuApp(DriverManager.getDriver());
-        System.out.println("Browser created by Thread : " + Thread.currentThread().getId() + " and Driver reference is : " + getThreadLocalDriver());
+        System.out.println("Browser created by Thread : " + Thread.currentThread().getId() + " and Driver reference is : " + DriverManager.getDriver());
 
     }
 
     @AfterMethod(alwaysRun = true)
     public void ihkTeardownAfterMethod(){
-        System.out.println(" Inside @ihkTeardownAfterMethod -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
-        //getThreadLocalDriver().quit();
+        System.out.println(" Inside @ihkTeardownAfterMethod -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
+        //DriverManager.getDriver().quit();
         DriverManager.quitDriver();
     }
 
     @Test(priority = 1)
     public void brokenImagesTest() throws IOException, InterruptedException {
-        System.out.println(" Inside brokenImagesTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside brokenImagesTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         List<Boolean> expectedList = new ArrayList<>();
         expectedList.add(false);
@@ -63,7 +63,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 2)
     public void challengingDOMTest() throws IOException, InterruptedException {
-        System.out.println(" Inside challengingDOMTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside challengingDOMTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Challenging DOM"));
         Assert.assertTrue(ihk.challengingDomTest(), "Validation of Challenging DOM");
@@ -71,7 +71,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 3)
     public void dragAndDropDemoTest() throws IOException, InterruptedException {
-        System.out.println(" Inside challengingDOMTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside challengingDOMTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Drag and Drop"));
         Assert.assertTrue(ihk.dragAndDropDemoTest(), "Validation of Drag And Drop");
@@ -79,7 +79,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 4)
     public void dynamicControlsCBtest() throws IOException, InterruptedException {
-        System.out.println(" Inside dynamicControlsCBtest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside dynamicControlsCBtest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Dynamic Controls"));
         Assert.assertEquals(ihk.dynamicControlsCBtest("Remove"), "It's gone!");
@@ -88,7 +88,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 5)
     public void dynamicControlsIPTest() throws IOException, InterruptedException {
-        System.out.println(" Inside dynamicControlsIPTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside dynamicControlsIPTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Dynamic Controls"));
         Assert.assertEquals(ihk.dynamicControlsIPTest(true), "It's enabled!");
@@ -97,7 +97,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 6)
     public void dynamicLoadTest1() throws IOException, InterruptedException {
-        System.out.println(" Inside dynamicLoadTest1 -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside dynamicLoadTest1 -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Dynamic Loading"));
         Assert.assertEquals(ihk.dynamicLoadTest("hiddenElement"), "Hello World!");
@@ -105,7 +105,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 7)
     public void dynamicLoadTest2() throws IOException, InterruptedException {
-        System.out.println(" Inside dynamicLoadTest2 -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside dynamicLoadTest2 -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Dynamic Loading"));
         Assert.assertEquals(ihk.dynamicLoadTest("renderedElement"),"Hello World!");
@@ -113,7 +113,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 8)
     public void fileUploadTest() throws IOException, InterruptedException {
-        System.out.println(" Inside fileUploadTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside fileUploadTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("File Upload"));
         String filepath = System.getProperty("user.dir") + "//pom.xml";
@@ -122,7 +122,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 9)
     public void horizontalScrollingTest() throws IOException, InterruptedException {
-        System.out.println(" Inside horizontalScrollingTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside horizontalScrollingTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Horizontal Slider"));
         Assert.assertNotEquals(ihk.horizontalScrollingTest("10") , "");
@@ -130,7 +130,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 10)
     public void hoverImagesTest() throws IOException, InterruptedException {
-        System.out.println(" Inside hoverImagesTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside hoverImagesTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Hovers"));
         Assert.assertTrue(ihk.hoverImagesTest());
@@ -138,7 +138,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 11)
     public void infiniteScrollTest() throws IOException, InterruptedException {
-        System.out.println(" Inside infiniteScrollTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside infiniteScrollTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Infinite Scroll"));
         ihk.infiniteScrollTest(8);
@@ -146,7 +146,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 12)
     public void jQueryMenuListTest() throws IOException, InterruptedException {
-        System.out.println(" Inside jQueryMenuListTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside jQueryMenuListTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("JQuery UI Menus"));
         ihk.jQueryMenuListTest("PDF");
@@ -156,7 +156,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 13)
     public void keyPressEventTest() throws IOException, InterruptedException {
-        System.out.println(" Inside keyPressEventTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside keyPressEventTest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Key Presses"));
         Assert.assertTrue(ihk.keyPressEventTest("d"));
@@ -166,7 +166,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 14)
     public void shadowDOMtest() throws IOException, InterruptedException {
-        System.out.println(" Inside shadowDOMtest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside shadowDOMtest -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
 
         Assert.assertTrue(ihk.selectFromMenu("Shadow DOM"));
         ihk.shadowDOMtest();
@@ -174,7 +174,7 @@ public class InternetHerokuAppTest extends TestBase {
 
     @Test(priority = 15, dataProvider = "loginTestdataDP", dataProviderClass = ExcelSheetUtils.class)
     public void formAuthenticationTest(String uname, String pwd) throws IOException, InterruptedException {
-        System.out.println(" Inside formAuthenticationTest DP example -> Thread : " + Thread.currentThread().getId() +" & Driver : " +getThreadLocalDriver());
+        System.out.println(" Inside formAuthenticationTest DP example -> Thread : " + Thread.currentThread().getId() +" & Driver : " +DriverManager.getDriver());
         Assert.assertTrue(ihk.selectFromMenu("Form Authentication"));
         ihk.formAuthenticationTest(uname,pwd);
     }
@@ -213,6 +213,6 @@ public class InternetHerokuAppTest extends TestBase {
         threadLocalDriver.set(new ChromeDriver(chromeService, chromeOptions));
                 //WebDriverManager.chromedriver().setup();
                         //getScreenShotAsFile();
-        //ihk = new InternetHerokuApp(getThreadLocalDriver());
+        //ihk = new InternetHerokuApp(DriverManager.getDriver());
  */
 }

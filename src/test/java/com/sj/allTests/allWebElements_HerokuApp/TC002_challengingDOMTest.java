@@ -10,10 +10,10 @@ import java.io.IOException;
 
 
 public class TC002_challengingDOMTest extends internetHerokuAppTestBase {
-
+    private static final Logger logger = LogManager.getLogger(TC002_challengingDOMTest.class);
     @Test
     public void TC002_challengingDOMTest() throws IOException, InterruptedException {
-        logger.info(" In TC002_challengingDOMTest -> test invoked by Thread -> {} & Driver -> {} ", Thread.currentThread().getId(), DriverManager.getDriver());
+        logger.info(" Inside TC002_challengingDOMTest -> Thread : {} & Driver {}", Thread.currentThread().threadId(), DriverManager.getDriver());
         Assert.assertTrue(ihk.selectFromMenu("Challenging DOM"));
         Assert.assertTrue(ihk.challengingDomTest(), "Validation of Challenging DOM");
     }

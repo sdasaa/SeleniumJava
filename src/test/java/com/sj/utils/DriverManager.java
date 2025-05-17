@@ -10,21 +10,23 @@ public class DriverManager {
     private static final Logger logger = LogManager.getLogger(DriverManager.class);
 
     public static WebDriver getDriver() {
-        //logger.info("In DriverManager-getDriver(), Invoked by Thread -> {} & Getting driver -> {}", Thread.currentThread().getId(), DriverManager.threadLocalDriver.get().toString());
         return threadLocalDriver.get();
     }
 
     public static void setDriver(WebDriver driver) {
         threadLocalDriver.set(driver);
-        logger.info("In DriverManager-setDriver(), Invoked by Thread -> {} & Setting driver -> {}", Thread.currentThread().getId(), DriverManager.threadLocalDriver.get().toString());
+        logger.info("In DriverManager-setDriver(), Invoked by Thread -> {} & Setting driver -> {}", Thread.currentThread().threadId(), DriverManager.threadLocalDriver.get().toString());
     }
 
     public static void quitDriver() {
-        logger.info("In DriverManager-quitDriver(), Invoked by Thread -> {} & Removing driver -> {}", Thread.currentThread().getId(), DriverManager.threadLocalDriver.get().toString());
-        if(TestBase.runOnSeleniumGrid)
+        logger.info("In DriverManager-quitDriver(), Invoked by Thread -> {} & Removing driver -> {}", Thread.currentThread().threadId(), DriverManager.threadLocalDriver.get().toString());
+        if(Boolean.parseBoolean(ConfigurationUtilities.getProperty(Constants.GRID_ENADLED))) {
+            logger.info(" GRID_ENABLED is TRUE, quitting all WebDriver instances");
             threadLocalDriver.get().quit();
-        else
+        }else {
+            logger.info(" GRID_ENABLED is FALSE, Closing this WebDriver instance alone -> {}", Thread.currentThread().threadId());
             threadLocalDriver.get().close();
+        }
         threadLocalDriver.remove();
     }
 }

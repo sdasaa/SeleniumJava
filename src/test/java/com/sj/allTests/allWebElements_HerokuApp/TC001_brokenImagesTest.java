@@ -12,9 +12,10 @@ import java.util.List;
 
 
 public class TC001_brokenImagesTest extends internetHerokuAppTestBase {
+    private static final Logger logger = LogManager.getLogger(TC001_brokenImagesTest.class);
     @Test
     public void TC001_brokenImagesTest() {
-        logger.info(" In TC001_brokenImagesTest -> test invoked by Thread -> {} & Driver -> {} ", Thread.currentThread().getId(), DriverManager.getDriver());
+        logger.info(" Inside TC001_brokenImagesTest -> Thread : {} & Driver {}", Thread.currentThread().threadId(), DriverManager.getDriver());
         List<Boolean> expectedList = new ArrayList<>();
         expectedList.add(false);
         expectedList.add(false);

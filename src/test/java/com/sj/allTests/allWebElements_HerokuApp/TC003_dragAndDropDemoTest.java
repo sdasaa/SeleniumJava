@@ -10,10 +10,10 @@ import java.io.IOException;
 
 
 public class TC003_dragAndDropDemoTest extends internetHerokuAppTestBase{
-
+    private static final Logger logger = LogManager.getLogger(TC003_dragAndDropDemoTest.class);
     @Test
     public void TC003_dragAndDropDemoTest() throws IOException, InterruptedException {
-        logger.info(" In TC003_dragAndDropDemoTest -> test invoked by Thread -> {} & Driver -> {} ", Thread.currentThread().getId(), DriverManager.getDriver());
+        logger.info(" Inside TC003_dragAndDropDemoTest -> Thread : {} & Driver {}", Thread.currentThread().threadId(), DriverManager.getDriver());
         Assert.assertTrue(ihk.selectFromMenu("Drag and Drop"));
         Assert.assertTrue(ihk.dragAndDropDemoTest(), "Validation of Drag And Drop");
     }

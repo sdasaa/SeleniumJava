@@ -1,6 +1,8 @@
 package com.sj.PageObjects;
 
 import com.sj.BasePage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -13,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InternetHerokuApp extends BasePage {
-
+    public static final Logger logger = LogManager.getLogger(InternetHerokuApp.class);
     public InternetHerokuApp(WebDriver driver) {
         super(driver);
     }
@@ -411,7 +413,14 @@ public class InternetHerokuApp extends BasePage {
         getWebWait().until(driver -> {
             return  driver.findElement(formAuthResponseElm).isDisplayed();
         });
-        return driver.findElement(formAuthResponseElm).getText().trim();
+        String result = driver.findElement(formAuthResponseElm).getDomAttribute("class").contains("success") ? "Pass" : "Fail";
+        System.out.println(" ^^^^^^^ "+result+" ^^^^^^^^^^");
+        String oldUrl = driver.getCurrentUrl();
+        getWebWait().until(driver -> {
+            driver.navigate().back();
+            return !driver.getCurrentUrl().equalsIgnoreCase(oldUrl);
+        });
+        return result;
     }
 
     public void waitForDOMLoadingToComplete(){

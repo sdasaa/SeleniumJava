@@ -5,7 +5,7 @@
                    https://logging.apache.org/xml/ns
                    https://logging.apache.org/xml/ns/log4j-config-2.xsd">
     <Properties>
-        <Property name="logDir" value="./logs/log4j2"/>
+        <Property name="logDir" value="./logs/log4j"/>
         <Property name="standAloneFile" value="${logDir}/TestExecution_Standalone.log"/>
         <Property name="rollingFile" value="${logDir}/TestExecution_RollingFile.log"/>
     </Properties>

@@ -4,10 +4,9 @@
         <listener class-name="com.sj.utils.TestListener"/>
     </listeners>
     <parameter name="TestModule" value="HerokuAppTest" />
-    <!--test name="InternetHerokuAppTest1"-->
     <test name="TestInternetHerokuApp" parallel="classes" thread-count="1">
         <classes>
-            <!--class name="com.sj.allTests.allWebElements_HerokuApp.TC001_brokenImagesTest"/>
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC001_brokenImagesTest"/>
             <class name="com.sj.allTests.allWebElements_HerokuApp.TC002_challengingDOMTest"/>
             <class name="com.sj.allTests.allWebElements_HerokuApp.TC003_dragAndDropDemoTest"/>
             <class name="com.sj.allTests.allWebElements_HerokuApp.TC004_dynamicControlsCBtest"/>
@@ -20,8 +19,9 @@
             <class name="com.sj.allTests.allWebElements_HerokuApp.TC011_infiniteScrollTest"/>
             <class name="com.sj.allTests.allWebElements_HerokuApp.TC012_jQueryMenuListTest"/>
             <class name="com.sj.allTests.allWebElements_HerokuApp.TC013_keyPressEventTest"/>
-            <class name="com.sj.allTests.allWebElements_HerokuApp.TC014_shadowDOMtest"/-->
+            <class name="com.sj.allTests.allWebElements_HerokuApp.TC014_shadowDOMtest"/>
             <class name="com.sj.allTests.allWebElements_HerokuApp.TC015_formAuthenticationTest"/>
         </classes>
     </test>
+    <!--test name="InternetHerokuAppTest2"></test-->
 </suite>
