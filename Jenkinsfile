@@ -42,8 +42,8 @@ pipeline{
                 // bat "docker login -u ${DOCKER_CRED_USR} -p ${DOCKER_CRED_PSW}"
                 // Secure way
                 // ****************** NOTE:Using single quotes here, since the cmd needs to be passed as is and not expanded version *****************
-                bat 'echo ${DOCKER_CRED_PSW} | docker login -u ${DOCKER_CRED_USR} --password-stdin'
-                bat "docker push"
+                bat "echo ${DOCKER_CRED_PSW} | docker login -u ${DOCKER_CRED_USR} --password-stdin"
+                bat "docker push sdasa/selenium-docker:latest"
             }
 
         }
