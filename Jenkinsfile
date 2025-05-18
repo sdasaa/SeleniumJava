@@ -34,7 +34,7 @@ pipeline{
 
         stage('Pushing Image to DockerHub with Credentials'){
             environment{
-                DOCKER_CRED = credentials('dockerHubPersonalToken')
+                DOCKER_CRED = credentials('DockerHubPersonalToken')
             }
             steps{
                 echo " Entering credentials to login to Dockerhub "
