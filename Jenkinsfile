@@ -37,12 +37,14 @@ pipeline{
                 DOCKER_CRED = credentials('DockerHubPersonalToken')
             }
             steps{
+                echo " logout if logged in already"
+                bat "docker logout"
                 echo " Entering credentials to login to Dockerhub "
                 // Unsecure way
                 // bat "docker login -u ${DOCKER_CRED_USR} -p ${DOCKER_CRED_PSW}"
                 // Secure way
                 // ****************** NOTE:Using single quotes here, since the cmd needs to be passed as is and not expanded version *****************
-                bat "echo ${DOCKER_CRED_PSW} | docker login -u ${DOCKER_CRED_USR} --password-stdin"
+                bat 'echo ${DOCKER_CRED_PSW} | docker login -u ${DOCKER_CRED_USR} --password-stdin'
                 bat "docker push sdasa/selenium-docker:latest"
             }
 
@@ -50,8 +52,14 @@ pipeline{
     }
 
     post{
-        always{
+        success{
             bat "docker logout"
+        }
+        failure{
+            echo "FAILED !!"
+        }
+        always{
+            echo " From Always!!"
         }
     }
 }
