@@ -4,7 +4,7 @@
     2. Code is downloaded to node from gitHub, we can view this using mapped volume ./volumes/slave
     3. Stage1 - Compile the code using 'mvn clean package -DskipTests'
     4. Stage2 - Build a docker image out of it as described in the Dockerfile of the repo
-    5. Stage3 - Login to the users Dockerhub account using the 'Jenking credentials' --> username/generated access token
+    5. Stage3 - Login to the users Dockerhub account using the 'Jenkins credentials' --> username/generated access token
               - Then push the built image once login succeeds
     6. Post Build - Logouts of the Dockerhub account
 
@@ -12,54 +12,63 @@
 
 pipeline{
 
+    // Here we are assigning a Jenkins node labelled docker as default for all the stages.
     agent{
-        label 'windows'
+        label 'docker'
+    }
+
+    // Defining static variables inside the env block
+    environment{
+        IMAGE_NAME='sdasa/selenium-docker'
+        IMAGE_TAG_LATEST='latest'
+        DOCKER_HUB_CREDENTIALS= credentials('DockerHubPersonalToken')
     }
 
     stages{
 
-        stage('building jar'){
+        stage('Building project jar'){
             steps{
-                echo " Building the project jar "
-                bat "mvn clean package -DskipTests"
+                echo "Compiling project and Building jar"
+                sh "mvn clean package -DskipTests"
             }
         }
 
         stage('Building Docker Image'){
             steps{
-                echo " Building Docker Image "
-                bat "docker build -t sdasa/selenium-docker:latest ."
+                echo "Building Docker Image"
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG_LATEST} ."
             }
         }
 
-        stage('Pushing Image to DockerHub with Credentials'){
-            environment{
-                DOCKER_CRED = credentials('DockerHubPersonalToken')
-            }
-            steps{
-                echo " logout if logged in already"
-                bat "docker logout"
-                echo " Entering credentials to login to Dockerhub "
-                // Unsecure way
-                // bat "docker login -u ${DOCKER_CRED_USR} -p ${DOCKER_CRED_PSW}"
-                // Secure way
-                // ****************** NOTE:Using single quotes here, since the cmd needs to be passed as is and not expanded version *****************
-                bat 'echo ${DOCKER_CRED_PSW} | docker login -u ${DOCKER_CRED_USR} --password-stdin'
-                bat "docker push sdasa/selenium-docker:latest"
-            }
+        stage('Pushing Image to DockerHub with Credentials') {
+            steps {
+                script {
+                    echo "Logging out of Docker if already logged in"
+                    sh "docker logout"
 
+                    echo "Logging in to DockerHub with secure credentials"
+                    sh 'echo ${DOCKER_HUB_PSW} | docker login -u ${DOCKER_HUB_USR} --password-stdin'
+
+                    echo "Pusing the Image - ${IMAGE_NAME}"
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+
+                    // TBD:Implementation for custom tag
+                    }
+                }
+            }
         }
     }
 
     post{
         success{
-            bat "docker logout"
+            echo "Building and Pushing of Image successful, Logging out of Docker"
+            sh "docker logout"
         }
         failure{
-            echo "FAILED !!"
+            echo "Job FAILED !!"
         }
         always{
-            echo " From Always!!"
+            echo "Running Always block"
         }
     }
 }
