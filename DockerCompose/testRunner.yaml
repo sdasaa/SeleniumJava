@@ -1,0 +1,10 @@
+version: "3"
+services:
+  testRunner:
+    image: sdasa/selenium-docker:latest
+    container_name: testRunner
+    environment:
+    - GRID_ENABLED=true
+    - GRID_HOST # shorthand for GRID_HOST=${GRID_HOST}
+    - BROWSER # When using shorthand, you cant define defaults, (i.e) - Browser:-defaultValue
+    - THREAD_COUNT # if you want defaults, no shorthands --> - PROP1 = ${PROP1:-defaultValue}
