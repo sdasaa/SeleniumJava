@@ -15,14 +15,18 @@ pipeline{
     stages{
 
         stage('Pull & Start Selenium:hub,chrome & firefox images'){
-            echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
-            sh 'cp dockerCompose/* .'
-            sh 'docker compose -f hub.yaml up -d'
+            steps{
+                echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
+                sh 'cp dockerCompose/* .'
+                sh 'docker compose -f hub.yaml up -d'
+            }
         }
 
         stage('Start TestRunner execution'){
-            echo 'Pull the selenium-docker Image from DockerHub'
-            sh 'docker compose -f testRunner.yaml up '
+            steps{
+                echo 'Pull the selenium-docker Image from DockerHub'
+                sh 'docker compose -f testRunner.yaml up '
+            }
         }
 
     }
