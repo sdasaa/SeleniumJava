@@ -50,7 +50,7 @@ pipeline{
                     sh 'echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin'
 
                     echo "Pusing the Image - ${IMAGE_NAME}"
-                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG_LATEST}"
 
                     // TBD:Implementation for custom tag
                     }
