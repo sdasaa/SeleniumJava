@@ -1,0 +1,36 @@
+/*
+    Given below are the goals of this Pipeline Job:
+        Pre-req: The project seleniumJava has been cloned inside the node & java, maven & docker is pre-installed
+        1. Pull and Run the Selenium Hub, Chrome & firefox containers ---> Bring up the hub.yaml
+        2. Pull the selenium-docker Image from DockerHub
+        3. Start the test container
+*/
+pipeline{
+
+    // Setting default JenkinsAgent which is labelles as docker for all the stages
+    agent{
+        label 'docker'
+    }
+
+    stages{
+
+        stage('Pull & Start Selenium:hub,chrome & firefox images'){
+            echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
+            sh 'cp dockerCompose/* .'
+            sh 'docker compose -f hub.yaml up -d'
+        }
+
+        stage('Start TestRunner execution'){
+            echo 'Pull the selenium-docker Image from DockerHub'
+            sh 'docker compose -f testRunner.yaml up '
+        }
+
+    }
+
+
+    post{
+        always{
+            echo "Execution complete"
+        }
+    }
+}
