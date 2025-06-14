@@ -24,6 +24,8 @@ COUNT=1
 
 while [ "$( curl -s http://${GRID_HOST:-hub}:4444/status | jq -r .value.ready )" != true ]
 do
+  echo "The ready status is:"
+  echo "$( curl -s http://${GRID_HOST:-hub}:4444/status | jq -r .value.ready )"
 	echo " Attempt : ${COUNT}, The HUB is NOT ready "
 	COUNT=$((COUNT+1))
 		if [ "${COUNT}" -ge 30 ]
