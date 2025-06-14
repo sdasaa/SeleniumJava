@@ -25,7 +25,7 @@ pipeline{
         stage('Start TestRunner execution'){
             steps{
                 echo 'Pull the selenium-docker Image from DockerHub'
-                sh 'docker compose -f testRunner.yaml up '
+                sh 'docker compose --env-file node.properties -f testRunner.yaml up'
             }
         }
 
