@@ -1,10 +1,6 @@
 version: "3"
 services:
   testRunner:
-    #image: sdasa/selenium-docker:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: sdasa/selenium-docker:latest
     container_name: testRunner
     environment:
