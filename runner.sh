@@ -31,7 +31,7 @@ do
 			echo " The HUB is NOT ready even after 30 seconds, Aborting !! "
 			exit 1
 		fi
-	sleep 10
+	sleep 15
 done
 
 ######################## 3.Invokes test run using java cmd  ########################
