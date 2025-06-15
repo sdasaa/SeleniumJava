@@ -14,6 +14,8 @@ COPY /target/docker-resources .
 COPY ./runner.sh .
 
 # 6. Create a results dir to volume map all test run artifacts for triaging
+# Note: The following step is redundant because, the testRunner.yaml has volume mapping ./results:/home/das/selenium-docker/results
+#       Now theres no harm in creating again, since this cmd will be inefffective but wouldn't fail
 RUN mkdir results
 
 # 7. Setting entrypoint for the image

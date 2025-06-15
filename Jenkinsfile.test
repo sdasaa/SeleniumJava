@@ -2,8 +2,9 @@
     Given below are the goals of this Pipeline Job:
         Pre-req: The project seleniumJava has been cloned inside the node & java, maven & docker is pre-installed
         1. Pull and Run the Selenium Hub, Chrome & firefox containers ---> Bring up the hub.yaml
-        2. Pull the selenium-docker Image from DockerHub
-        3. Start the test container
+        2. Pull & start the selenium-docker Image from DockerHub
+        3. Cleanup hub, chromeNode & firefoxNode container under post-always
+        4. Archive the test run artifacts under the results dir, which is vol mapped from testRunner.yaml file to dockerLinuxNode/workspace
 */
 pipeline{
 
@@ -17,7 +18,8 @@ pipeline{
         stage('Pull & Start Selenium:hub,chrome & firefox images'){
             steps{
                 echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
-                sh 'cd dockerCompose/ && docker compose --env-file node.properties -f hub.yaml up -d'
+                sh 'cp dockerCompose/* .'
+                sh 'docker compose --env-file node.properties -f hub.yaml up -d'
             }
         }
 
