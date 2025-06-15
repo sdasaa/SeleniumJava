@@ -6,6 +6,8 @@ services:
   testRunner:
     image: sdasa/selenium-docker:latest
     container_name: testRunner
+    volumes:
+      - ./results:/home/das/selenium-docker/results
     environment:
     - GRID_ENABLED=true
     - GRID_HOST # shorthand for GRID_HOST=${GRID_HOST}

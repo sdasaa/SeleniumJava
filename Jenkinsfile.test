@@ -17,7 +17,8 @@ pipeline{
         stage('Pull & Start Selenium:hub,chrome & firefox images'){
             steps{
                 echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
-                sh 'cp dockerCompose/* .'
+                #sh 'cp dockerCompose/* .'
+                sh 'cd dockerCompose/'
                 sh 'docker compose --env-file node.properties -f hub.yaml up -d'
             }
         }
@@ -39,6 +40,7 @@ pipeline{
             sh 'docker rm -f hub || true'
             sh 'docker rm -f testRunner || true'
             sh 'docker system prune -f'
+            archiveArtifacts artifacts: 'results/*', followSymlinks: false
         }
     }
 }
