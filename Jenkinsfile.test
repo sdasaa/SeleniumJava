@@ -18,8 +18,7 @@ pipeline{
             steps{
                 echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
                 //sh 'cp dockerCompose/* .'
-                sh 'cd dockerCompose/'
-                sh 'docker compose --env-file node.properties -f hub.yaml up -d'
+                sh 'cd dockerCompose/ && docker compose --env-file node.properties -f hub.yaml up -d'
             }
         }
 
