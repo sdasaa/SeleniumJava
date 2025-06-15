@@ -18,7 +18,8 @@ pipeline{
             steps{
                 echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
                 //sh 'cp dockerCompose/* .'
-                sh 'cd dockerCompose/ && docker compose --env-file node.properties -f hub.yaml up -d'
+                sh 'cd dockerCompose/'
+                sh 'docker compose --env-file node.properties -f hub.yaml up -d'
             }
         }
 
@@ -37,6 +38,8 @@ pipeline{
             /* Forcefully deleting the created container names hub, chromeNode & firefoxNode
                Piping it to true, to make it failproof */
             sh 'docker rm -f hub || true'
+            sh 'docker rm -f chromeNode || true'
+            sh 'docker rm -f firefoxNode || true'
             sh 'docker rm -f testRunner || true'
             sh 'docker system prune -f'
             archiveArtifacts artifacts: 'results/*', followSymlinks: false
