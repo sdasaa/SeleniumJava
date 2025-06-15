@@ -34,7 +34,9 @@ pipeline{
 
     post{
         always{
-            sh 'docker rm -f '
+            /* Forcefully deleting the created container names hub, chromeNode & firefoxNode
+            */ Piping it to true, to make it failproof
+            sh 'docker rm -f hub || true'
             sh 'docker rm -f testRunner || true'
             sh 'docker system prune -f'
         }
