@@ -1,8 +1,18 @@
-version : "3"
+# Goals:
+#   1. Start Selenium-Hub container
+#   2. Port localhost:4444 to hub:4444 to view Grid from local
+#   3. Connecting 2 containers chromeNode & firefoxNode to the Hub
+#   4. The configurations needed to connect are placed in env-file=node.properties
+#   5. Setting replicas as 0 and scaling up if needed through cmd line:
+#       ex: docker compose -f hub.yaml up -d --scale firefoxNode=2
+#   For testing purpose, we have scaled chromeNode to 1 as default setup
+version : "3.8"
 services:
   hub:
     image: selenium/hub:latest
     container_name: hub
+    ports:
+      - 4444:4444 # mapping localhost:4444 to hub:4444
   chromeNode:
     image: selenium/node-chrome:latest
     container_name: chromeNode
@@ -12,7 +22,7 @@ services:
     env_file:
     - node.properties # The file extension doesn't matter
     deploy:
-      replicas: 0
+      replicas: 1
   firefoxNode:
     image: selenium/node-firefox:latest
     container_name: firefoxNode
@@ -23,5 +33,3 @@ services:
     - node.properties # The file extension doesn't matter
     deploy:
       replicas: 0
-    
-

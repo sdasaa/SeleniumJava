@@ -61,6 +61,7 @@ pipeline{
     post{
         success{
             echo "Building and Pushing of Image successful, Logging out of Docker"
+            sh "docker system prune -f"
             sh "docker logout"
         }
         failure{
@@ -68,6 +69,7 @@ pipeline{
         }
         always{
             echo "Running Always block"
+            sh "docker system prune -f"
         }
     }
 }

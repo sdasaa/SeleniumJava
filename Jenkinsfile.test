@@ -18,7 +18,7 @@ pipeline{
             steps{
                 echo 'Pull and Run the Selenium Hub, Chrome & firefox containers'
                 sh 'cp dockerCompose/* .'
-                sh 'docker compose --env-file node.properties -f hub.yaml up -d'
+                sh 'docker compose --env-file node.properties -f hub.yaml up -d --scale chromeNode=2'
             }
         }
 
@@ -34,7 +34,9 @@ pipeline{
 
     post{
         always{
-            echo "Execution complete"
+            sh 'docker rm -f '
+            sh 'docker rm -f testRunner || true'
+            sh 'docker system prune -f'
         }
     }
 }

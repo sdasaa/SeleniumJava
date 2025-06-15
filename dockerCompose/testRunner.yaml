@@ -1,4 +1,7 @@
-version: "3"
+# Goals:
+#   1. Start the sdasa/selenium-docker test runner container
+#   2. Pass the mentioned env variables from Jenkinsfile, if not default values are set from runner.sh
+version: "3.8"
 services:
   testRunner:
     image: sdasa/selenium-docker:latest

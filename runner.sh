@@ -9,12 +9,16 @@
 ######################## 1.Echo's env variables that are set in the system ########################
 echo " This script is used to run our sdasa/selenium-docker container post checking the Selenium Grid status "
 
+GRID_HOST=${GRID_HOST:-hub}
+BROWSER=${BROWSER:-chrome}
+THREAD_COUNT=${THREAD_COUNT:-2}
+
 echo " ================================================================================ "
 echo " The following env variables have been passed via docker-compose.yaml file "
-echo " 			GRID_ENABLED	: ${GRID_ENABLED:-true}				"
-echo " 			GRID_HOST		: ${GRID_HOST:-hub}					"
-echo " 			BROWSER			: ${BROWSER:-chrome}				"
-echo "			THREAD_COUNT	: ${THREAD_COUNT:-2}				"
+echo " 			GRID_ENABLED	: ${GRID_ENABLED}				"
+echo " 			GRID_HOST		  : ${GRID_HOST}					"
+echo " 			BROWSER			  : ${BROWSER}            "
+echo "			THREAD_COUNT	: ${THREAD_COUNT}				"
 echo " ================================================================================ "
 
 ######################## 2.Check if Grid container is up and in READY state ########################
