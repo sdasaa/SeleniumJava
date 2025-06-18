@@ -42,7 +42,7 @@ pipeline{
             sh 'docker rm -f firefoxNode || true'
             sh 'docker rm -f testRunner || true'
             sh 'docker system prune -f'
-            archiveArtifacts artifacts: 'results/*', followSymlinks: false
+            archiveArtifacts artifacts: 'results/**/*', followSymlinks: false
         }
     }
 }
